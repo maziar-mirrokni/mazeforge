@@ -25,7 +25,7 @@ proof app (a mini licensing workflow) end to end.
 
 **Definition of Done for the epic:** A stranger can watch a 3–5 minute demo and
 see an applicant move through a licensing workflow using a UI that was
-generated from a schema, not hand-coded per-entity.
+generated from a schema, not hand-coded per-object.
 
 ### V1-01: Project scaffolding
 - **Status:** [x]
@@ -40,16 +40,17 @@ generated from a schema, not hand-coded per-entity.
 - **Notes:** 2026-09-25: npm workspaces monorepo (server/: Express 5 + TS via tsx, :3001; client/: React 19 + Vite 6, :5173, proxies /api). `npm run dev` starts both; GET /api/health → 200; typecheck and build pass.
 
 ### V1-02: Schema format + loader
-- **Status:** [ ]
+- **Status:** [x]
 - **Estimate:** 2h
 - **Depends on:** V1-01
-- **Description:** Define the JSON schema shape for an entity (name, fields,
-  types, required flags). Write a loader that reads a schema file into memory.
+- **Description:** Define the JSON schema shape for an object (objectId, label,
+  fields, types, required flags). Write a loader that reads a schema file into
+  memory.
 - **Acceptance criteria:**
-  - [ ] Schema format documented (in code comments or a short spec file)
-  - [ ] Loader parses one hardcoded example schema without error
-  - [ ] Invalid schema shape throws a clear error
-- **Notes:**
+  - [x] Schema format documented (in code comments or a short spec file)
+  - [x] Loader parses one hardcoded example schema without error
+  - [x] Invalid schema shape throws a clear error
+- **Notes:** 2026-09-25: Format per approved proposal rev 3 (docs/schema-format.md): one file per object in schemas/, objectId/fieldId generated from label once at creation then immutable, 6 field types, built-in id + createdAt/updatedAt. zod validation; server refuses to start on invalid schemas and lists every error. 19 tests via node:test (`npm test`). Record ids will use the short-uuid library (decided 2026-09-25; implemented in V1-03).
 
 ### V1-03: Dynamic API generator (in-memory)
 - **Status:** [ ]
@@ -58,9 +59,10 @@ generated from a schema, not hand-coded per-entity.
 - **Description:** Given a loaded schema, auto-generate CRUD REST endpoints
   backed by an in-memory store.
 - **Acceptance criteria:**
-  - [ ] POST/GET/PUT/DELETE work for the hardcoded entity via curl/Postman
-  - [ ] Endpoints are generated from the schema, not hand-written per entity
-- **Notes:**
+  - [ ] POST/GET/PUT/DELETE work for the hardcoded object via curl/Postman
+  - [ ] Endpoints are generated from the schema, not hand-written per object
+- **Notes:** Decided 2026-09-25: record `id` is generated with the short-uuid
+  library (22-char base58 encoding of a UUID v4).
 
 ### V1-04: Real persistence (SQLite)
 - **Status:** [ ]
@@ -77,10 +79,10 @@ generated from a schema, not hand-coded per-entity.
 - **Status:** [ ]
 - **Estimate:** 2h
 - **Depends on:** V1-02
-- **Description:** Basic form UI to define a new entity and its fields,
+- **Description:** Basic form UI to define a new object and its fields,
   writing to the schema format from V1-02.
 - **Acceptance criteria:**
-  - [ ] User can create an entity with 2+ fields via the UI, no manual JSON editing
+  - [ ] User can create an object with 2+ fields via the UI, no manual JSON editing
   - [ ] New schema is persisted and loadable by the backend
 - **Notes:**
 
@@ -88,7 +90,7 @@ generated from a schema, not hand-coded per-entity.
 - **Status:** [ ]
 - **Estimate:** 2h
 - **Depends on:** V1-04, V1-05
-- **Description:** Given an entity schema, auto-render a create/edit form by
+- **Description:** Given an object schema, auto-render a create/edit form by
   mapping field types to input components.
 - **Acceptance criteria:**
   - [ ] Form renders correctly for at least 3 different field types
@@ -99,10 +101,10 @@ generated from a schema, not hand-coded per-entity.
 - **Status:** [ ]
 - **Estimate:** 2h
 - **Depends on:** V1-06
-- **Description:** Auto-generate a data grid page for any entity: list, view
+- **Description:** Auto-generate a data grid page for any object: list, view
   detail, delete. Wire to the V1-06 form for editing.
 - **Acceptance criteria:**
-  - [ ] List view shows all records for an entity
+  - [ ] List view shows all records for an object
   - [ ] Clicking a record opens it in the edit form
   - [ ] Delete removes a record and updates the list
 - **Notes:**
@@ -115,7 +117,7 @@ generated from a schema, not hand-coded per-entity.
   allowed transitions. UI to move a record between states; invalid
   transitions blocked server-side.
 - **Acceptance criteria:**
-  - [ ] Status field type is selectable when defining an entity
+  - [ ] Status field type is selectable when defining an object
   - [ ] UI only offers valid next-states for a record's current status
   - [ ] API rejects an invalid transition even if called directly
 - **Notes:**
@@ -135,11 +137,11 @@ generated from a schema, not hand-coded per-entity.
 - **Status:** [ ]
 - **Estimate:** 2h
 - **Depends on:** V1-08, V1-09
-- **Description:** Using the platform itself, define entities for a licensing
+- **Description:** Using the platform itself, define objects for a licensing
   workflow (Applicant, License Application, Review Decision) and run one
   applicant through the full lifecycle using the generated UI.
 - **Acceptance criteria:**
-  - [ ] All three entities defined via the platform's own schema tool
+  - [ ] All three objects defined via the platform's own schema tool
   - [ ] One applicant can be created, submitted, reviewed, and approved/denied
     entirely through the generated UI
 - **Notes:**
@@ -167,10 +169,10 @@ Work top to bottom; stop at any point and the demo is still coherent.
 - **Status:** [ ]
 - **Estimate:** 2h
 - **Depends on:** V1-09
-- **Description:** Define roles/permissions per entity, enforce in the API,
+- **Description:** Define roles/permissions per object, enforce in the API,
   hide/show UI elements accordingly.
 - **Acceptance criteria:**
-  - [ ] At least 2 roles exist with different entity-level permissions
+  - [ ] At least 2 roles exist with different object-level permissions
   - [ ] API enforces permissions even if UI is bypassed
   - [ ] UI hides actions the current role can't perform
 - **Notes:**
@@ -198,14 +200,14 @@ Work top to bottom; stop at any point and the demo is still coherent.
   - [ ] Generated schema is editable in the V1-05 schema editor before saving
 - **Notes:**
 
-### V2-04: Entity relationships
+### V2-04: Object relationships
 - **Status:** [ ]
 - **Estimate:** 2h
 - **Depends on:** V1-07
 - **Description:** Support foreign keys / one-to-many relationships between
-  entities, with auto-generated joined views.
+  objects, with auto-generated joined views.
 - **Acceptance criteria:**
-  - [ ] Schema supports a "reference" field type pointing to another entity
+  - [ ] Schema supports a "reference" field type pointing to another object
   - [ ] Detail view for a record shows its related child records
 - **Notes:**
 
@@ -281,5 +283,5 @@ Work top to bottom; stop at any point and the demo is still coherent.
 
 | Epic | Total stories | Done | Remaining hours |
 |---|---|---|---|
-| V1 | 11 | 1 | 20h |
+| V1 | 11 | 2 | 18h |
 | V2 | 10 | 0 | 20h |

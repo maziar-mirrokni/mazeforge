@@ -20,6 +20,13 @@ npm run dev
 - Frontend: http://localhost:5173
 - Health check: http://localhost:3001/api/health
 
+Run the tests with `npm test`.
+
+## Object schemas
+
+Objects are defined as JSON files in [schemas/](schemas/). See
+[docs/schema-format.md](docs/schema-format.md) for the format.
+
 ## License
 
 [MIT](LICENSE)

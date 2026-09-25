@@ -1,0 +1,46 @@
+{
+  "formatVersion": 1,
+  "objectId": "applicant",
+  "label": "Applicant",
+  "fields": [
+    {
+      "fieldId": "fullName",
+      "label": "Full name",
+      "type": "string",
+      "required": true,
+      "maxLength": 200
+    },
+    {
+      "fieldId": "email",
+      "label": "Email",
+      "type": "string",
+      "required": true
+    },
+    {
+      "fieldId": "dateOfBirth",
+      "label": "Date of birth",
+      "type": "date"
+    },
+    {
+      "fieldId": "yearsOfExperience",
+      "label": "Years of experience",
+      "type": "number",
+      "min": 0
+    },
+    {
+      "fieldId": "holdsAPriorLicense",
+      "label": "Holds a prior license",
+      "type": "boolean"
+    },
+    {
+      "fieldId": "licenseType",
+      "label": "License type",
+      "type": "enum",
+      "options": [
+        "electrician",
+        "plumber",
+        "general_contractor"
+      ]
+    }
+  ]
+}
