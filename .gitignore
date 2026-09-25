@@ -141,3 +141,15 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# --- mazeforge additions ---
+
+# SQLite databases (V1-04)
+*.db
+*.sqlite
+*.db-journal
+
+# OS / editor files
+.DS_Store
+Thumbs.db
+.idea/
