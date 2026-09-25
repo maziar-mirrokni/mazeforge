@@ -6,6 +6,13 @@ epic unless a dependency allows parallelizing. Check the box and add a one-line
 completion note (date + brief outcome) when a story is done. Do not mark a
 story done unless every acceptance criterion is met and the app still runs.
 
+**Roles:** The project owner acts as Solution Architect and owns all design
+and domain decisions. Claude Code provides implementation support only. Before
+implementing anything that involves a design choice (data models, schema
+formats, API contracts, libraries, architecture, UX flows), present the options
+with a recommendation and wait for the owner's approval. Implementing a design
+the owner has already approved needs no further sign-off.
+
 Status legend: `[ ]` not started · `[~]` in progress · `[x]` done · `[!]` blocked
 
 ---
