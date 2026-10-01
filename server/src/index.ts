@@ -1,12 +1,16 @@
 import path from "node:path";
 import { createApp } from "./app.js";
-import { InMemoryRecordStore } from "./records/store.js";
+import { openDatabase } from "./db/database.js";
+import { syncTables } from "./db/tables.js";
+import { SqliteRecordStore } from "./records/store.js";
 import type { ObjectSchema } from "./schema/format.js";
 import { loadSchemas, SchemaLoadError } from "./schema/loader.js";
 
 const port = Number(process.env.PORT ?? 3001);
-// Resolves to <repo>/schemas from both src/ (dev) and dist/ (build).
-const schemasDir = path.resolve(import.meta.dirname, "../../schemas");
+// Both resolve relative to the repo root, from src/ (dev) and dist/ (build).
+const repoRoot = path.resolve(import.meta.dirname, "../..");
+const schemasDir = path.join(repoRoot, "schemas");
+const databasePath = process.env.DATABASE_PATH ?? path.join(repoRoot, "data", "mazeforge.db");
 
 let schemas: Map<string, ObjectSchema>;
 try {
@@ -20,6 +24,19 @@ try {
   throw err;
 }
 
-createApp({ schemas, store: new InMemoryRecordStore() }).listen(port, () => {
+const db = openDatabase(databasePath);
+console.log(`Database: ${databasePath}`);
+for (const change of syncTables(db, schemas)) console.log(`  schema sync: ${change}`);
+
+const server = createApp({ schemas, store: new SqliteRecordStore(db, schemas) }).listen(port, () => {
   console.log(`mazeforge server listening on http://localhost:${port}`);
 });
+
+// Close the database cleanly so WAL contents are written back to the main file.
+for (const signal of ["SIGINT", "SIGTERM"] as const) {
+  process.on(signal, () => {
+    server.close();
+    db.close();
+    process.exit(0);
+  });
+}

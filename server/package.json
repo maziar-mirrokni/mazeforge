@@ -11,11 +11,13 @@
     "test": "tsx --test \"src/**/*.test.ts\""
   },
   "dependencies": {
+    "better-sqlite3": "^13.0.3",
     "express": "^5.1.0",
     "short-uuid": "^6.0.3",
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "^9.6.0",
     "@types/express": "^5.0.1",
     "@types/node": "^22.15.0",
     "tsx": "^4.19.3",

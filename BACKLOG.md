@@ -71,15 +71,21 @@ generated from a schema, not hand-coded per-object.
   filtering, sorting, PATCH moved to V2-11.
 
 ### V1-04: Real persistence (SQLite)
-- **Status:** [ ]
+- **Status:** [x]
 - **Estimate:** 2h
 - **Depends on:** V1-03
 - **Description:** Replace in-memory store with SQLite. Dynamically create
   tables from the schema on load.
 - **Acceptance criteria:**
-  - [ ] Table is created automatically from schema on startup
-  - [ ] Same CRUD endpoints from V1-03 now persist across restarts
-- **Notes:**
+  - [x] Table is created automatically from schema on startup
+  - [x] Same CRUD endpoints from V1-03 now persist across restarts
+- **Notes:** 2026-09-30: better-sqlite3; one STRICT table per object
+  (obj_<objectId>, one column per fieldId) at data/mazeforge.db (DATABASE_PATH
+  overrides). Startup sync creates tables, adds columns for new fields, and
+  drops columns/tables for removed fields/objects along with their data. Type
+  changes not handled (see TD-01). In-memory store removed; tests run on
+  in-memory SQLite. Verified with curl: record created, server restarted,
+  record read back unchanged. 42 tests pass.
 
 ### V1-05: Minimal schema editor UI
 - **Status:** [ ]
@@ -298,9 +304,26 @@ Work top to bottom; stop at any point and the demo is still coherent.
 
 ---
 
+## Tech Debt
+
+### TD-01: Tech Debt
+- **Status:** [ ]
+- **Estimate:** TBD
+- **Depends on:** none
+- **Description:** Known gaps to close. Each task needs a design proposal
+  approved before implementation.
+- **Tasks:**
+  - [ ] Make field `type` immutable: once a field is created, its type cannot
+    be changed. (Raised 2026-09-30 in V1-04: storage assumes a field's type
+    never changes, but nothing enforces it yet.)
+- **Notes:**
+
+---
+
 ## Progress tracking
 
 | Epic | Total stories | Done | Remaining hours |
 |---|---|---|---|
-| V1 | 11 | 3 | 16h |
+| V1 | 11 | 4 | 14h |
 | V2 | 11 | 0 | 22h |
+| Tech Debt | 1 | 0 | TBD |

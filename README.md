@@ -29,7 +29,7 @@ for creating, listing, reading, replacing, and deleting records. See
 
 | Done | Next |
 |---|---|
-| Project scaffolding; schema format and loader; generated CRUD API (in-memory) | SQLite persistence; schema editor UI |
+| Project scaffolding; schema format and loader; generated CRUD API; SQLite persistence | Schema editor UI; generated forms |
 
 The proof app for V1 is a mini licensing workflow: an applicant is created,
 submitted, reviewed, and approved or denied entirely through generated UI.
@@ -47,7 +47,10 @@ npm run dev
 - Health check: http://localhost:3001/api/health
 
 The server loads every schema in `schemas/` at startup and refuses to start if
-any is invalid, listing each problem with its file and location.
+any is invalid, listing each problem with its file and location. Records are
+stored in SQLite at `data/mazeforge.db`, and tables follow the schemas
+automatically. Removing a field or object from the schemas deletes its data
+on the next start; see [docs/schema-format.md](docs/schema-format.md#storage-and-schema-changes).
 
 | Command | What it does |
 |---|---|
@@ -63,6 +66,7 @@ any is invalid, listing each problem with its file and location.
 | `server/` | Node + Express + TypeScript API (port 3001) |
 | `client/` | React + Vite + TypeScript UI (port 5173, proxies `/api` to the server) |
 | `schemas/` | Object schemas, one JSON file per object |
+| `data/` | SQLite database (created on first start, not in git) |
 | `docs/` | Specifications |
 | `BACKLOG.md` | Build plan and progress |
 

@@ -101,3 +101,35 @@ would duplicate another id in the same scope, or would equal a built-in field.
 In V1 the loader enforces that ids exist and are well-formed, but it cannot
 detect a hand-edit to an existing id in a JSON file. The schema editor does not
 offer id editing.
+
+A field's `type` is also meant to be permanent once the field is created.
+Enforcing this is tracked as tech debt (TD-01 in BACKLOG.md).
+
+## Storage and schema changes
+
+Each object is stored in its own SQLite table, `obj_<objectId>`, with one
+column per field:
+
+| Field type | Column type |
+|---|---|
+| `string`, `text`, `enum`, `date` | TEXT |
+| `number` | REAL |
+| `boolean` | INTEGER (0/1; the API returns `true`/`false`) |
+
+Tables are STRICT, so SQLite rejects a value of the wrong type. All other rules
+(`required`, `maxLength`, `min`/`max`, enum `options`) are enforced by the API.
+
+At startup the server compares each schema with its table and logs every change
+it makes:
+
+| Schema change | Effect on the database |
+|---|---|
+| New object | Its table is created. |
+| New field | A column is added; existing records get `null`. |
+| **Field removed** | **The column and every value in it are deleted.** |
+| **Object removed** (schema file deleted) | **The table and all its records are deleted.** |
+| Label, `required`, `maxLength`, `min`/`max`, or enum `options` changed | Nothing. Existing values are re-checked the next time each record is updated. |
+
+> **Warning:** removing a field from a schema, or deleting a schema file,
+> permanently deletes that data the next time the server starts. There is no
+> undo; back up `data/mazeforge.db` first if the data matters.

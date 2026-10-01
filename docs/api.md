@@ -92,6 +92,7 @@ Every error has the same shape:
 
 ## Storage
 
-V1-03 keeps records in memory, so they are lost on restart. V1-04 replaces this
-with SQLite behind the same `RecordStore` interface
-([server/src/records/store.ts](../server/src/records/store.ts)).
+Records are stored in SQLite, at `data/mazeforge.db` by default (override with
+the `DATABASE_PATH` environment variable). Each object has its own table; see
+[schema-format.md](schema-format.md#storage-and-schema-changes) for how tables
+follow schema changes.

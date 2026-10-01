@@ -145,6 +145,7 @@ vite.config.ts.timestamp-*
 # --- mazeforge additions ---
 
 # SQLite databases (V1-04)
+data/
 *.db
 *.sqlite
 *.db-journal

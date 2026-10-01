@@ -3,8 +3,10 @@ import assert from "node:assert/strict";
 import type { Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { createApp } from "../app.js";
+import { openDatabase, type Db } from "../db/database.js";
+import { syncTables } from "../db/tables.js";
 import type { ObjectSchema } from "../schema/format.js";
-import { InMemoryRecordStore } from "./store.js";
+import { SqliteRecordStore, type RecordStore } from "./store.js";
 
 const applicant: ObjectSchema = {
   formatVersion: 1,
@@ -20,29 +22,38 @@ const applicant: ObjectSchema = {
   ],
 };
 
+const schemas = new Map([["applicant", applicant]]);
+
 let server: Server;
 let base: string;
-let store: InMemoryRecordStore;
+let db: Db | undefined;
+let store: RecordStore;
 
 before(async () => {
   // The app reads the store through this wrapper, so each test can start empty.
-  const delegate = {
-    create: (...a: Parameters<InMemoryRecordStore["create"]>) => store.create(...a),
-    list: (...a: Parameters<InMemoryRecordStore["list"]>) => store.list(...a),
-    get: (...a: Parameters<InMemoryRecordStore["get"]>) => store.get(...a),
-    replace: (...a: Parameters<InMemoryRecordStore["replace"]>) => store.replace(...a),
-    delete: (...a: Parameters<InMemoryRecordStore["delete"]>) => store.delete(...a),
+  const delegate: RecordStore = {
+    create: (...a) => store.create(...a),
+    list: (...a) => store.list(...a),
+    get: (...a) => store.get(...a),
+    replace: (...a) => store.replace(...a),
+    delete: (...a) => store.delete(...a),
   };
-  const app = createApp({ schemas: new Map([["applicant", applicant]]), store: delegate });
+  const app = createApp({ schemas, store: delegate });
   server = app.listen(0);
   await new Promise<void>((resolve) => server.once("listening", resolve));
   base = `http://127.0.0.1:${(server.address() as AddressInfo).port}/api/v1/objects`;
 });
 
-after(() => server.close());
+after(() => {
+  server.close();
+  db?.close();
+});
 
 beforeEach(() => {
-  store = new InMemoryRecordStore();
+  db?.close();
+  db = openDatabase(":memory:");
+  syncTables(db, schemas);
+  store = new SqliteRecordStore(db, schemas);
 });
 
 async function call(method: string, path: string, body?: unknown) {
