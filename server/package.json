@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "express": "^5.1.0",
+    "short-uuid": "^6.0.3",
     "zod": "^4.6.5"
   },
   "devDependencies": {

@@ -53,16 +53,22 @@ generated from a schema, not hand-coded per-object.
 - **Notes:** 2026-09-25: Format per approved proposal rev 3 (docs/schema-format.md): one file per object in schemas/, objectId/fieldId generated from label once at creation then immutable, 6 field types, built-in id + createdAt/updatedAt. zod validation; server refuses to start on invalid schemas and lists every error. 19 tests via node:test (`npm test`). Record ids will use the short-uuid library (decided 2026-09-25; implemented in V1-03).
 
 ### V1-03: Dynamic API generator (in-memory)
-- **Status:** [ ]
+- **Status:** [x]
 - **Estimate:** 2h
 - **Depends on:** V1-02
 - **Description:** Given a loaded schema, auto-generate CRUD REST endpoints
   backed by an in-memory store.
 - **Acceptance criteria:**
-  - [ ] POST/GET/PUT/DELETE work for the hardcoded object via curl/Postman
-  - [ ] Endpoints are generated from the schema, not hand-written per object
+  - [x] POST/GET/PUT/DELETE work for the hardcoded object via curl/Postman
+  - [x] Endpoints are generated from the schema, not hand-written per object
 - **Notes:** Decided 2026-09-25: record `id` is generated with the short-uuid
   library (22-char base58 encoding of a UUID v4).
+  2026-09-30: Generic routes at /api/v1/objects/:objectId/records[/:id] per
+  approved proposal (docs/api.md): PUT = full replace, flat records with null
+  for unset fields, "" stored as null, built-ins in body ignored, unknown
+  fields rejected, standard error shape. RecordStore interface with in-memory
+  Map backing. Full CRUD cycle verified with curl; 34 tests pass. Pagination,
+  filtering, sorting, PATCH moved to V2-11.
 
 ### V1-04: Real persistence (SQLite)
 - **Status:** [ ]
@@ -187,7 +193,8 @@ Work top to bottom; stop at any point and the demo is still coherent.
   - [ ] Requests beyond a configured rate limit are rejected with a clear error
   - [ ] API key required for generated endpoints
   - [ ] At least one endpoint demonstrates a versioned path (e.g. /v1/, /v2/)
-- **Notes:**
+- **Notes:** Since V1-03 (decided 2026-09-30), generated endpoints already live
+  under /api/v1/. This story adds a /v2/ variant of at least one endpoint.
 
 ### V2-03: AI-assisted scaffolding
 - **Status:** [ ]
@@ -277,11 +284,23 @@ Work top to bottom; stop at any point and the demo is still coherent.
   - [ ] Export produces a runnable standalone artifact
 - **Notes:**
 
+### V2-11: API querying and partial updates
+- **Status:** [ ]
+- **Estimate:** 2h
+- **Depends on:** V1-04
+- **Description:** Extend the generated record endpoints with pagination,
+  filtering, sorting, and PATCH (partial update). Deferred from V1-03.
+- **Acceptance criteria:**
+  - [ ] List endpoint supports pagination, with the total count in the response
+  - [ ] List endpoint supports filtering by field value and sorting by any field
+  - [ ] PATCH updates only the fields sent, with the same validation as PUT
+- **Notes:**
+
 ---
 
 ## Progress tracking
 
 | Epic | Total stories | Done | Remaining hours |
 |---|---|---|---|
-| V1 | 11 | 2 | 18h |
-| V2 | 10 | 0 | 20h |
+| V1 | 11 | 3 | 16h |
+| V2 | 11 | 0 | 22h |

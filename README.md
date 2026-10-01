@@ -21,11 +21,15 @@ single applicant.
 
 Full details: [docs/schema-format.md](docs/schema-format.md).
 
+Each object automatically gets a REST API at `/api/v1/objects/<objectId>/records`
+for creating, listing, reading, replacing, and deleting records. See
+[docs/api.md](docs/api.md).
+
 ## Status
 
 | Done | Next |
 |---|---|
-| Project scaffolding; schema format and loader | Generated CRUD API for each object |
+| Project scaffolding; schema format and loader; generated CRUD API (in-memory) | SQLite persistence; schema editor UI |
 
 The proof app for V1 is a mini licensing workflow: an applicant is created,
 submitted, reviewed, and approved or denied entirely through generated UI.
